@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wichita Catholic Mass Times</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8f7;
+      --panel: #ffffff;
+      --ink: #1d2329;
+      --muted: #5f6973;
+      --line: #d9d4ca;
+      --brand: #7c2d2d;
+      --brand-strong: #5f1f1f;
+      --accent: #0f766e;
+      --soft: #e9eeeb;
+      --shadow: 0 18px 45px rgba(31, 35, 40, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(15, 118, 110, 0.1), transparent 280px),
+        var(--bg);
+    }
+
+    a {
+      color: var(--brand);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 18px;
+      padding: 18px 0 26px;
+    }
+
+    .eyebrow {
+      color: var(--brand);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      max-width: 780px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.55;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .summary span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: end;
+      margin: 8px 0 18px;
+      padding: 14px;
+      border: 1px solid rgba(217, 212, 202, 0.9);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.98rem;
+      outline: none;
+      padding: 0 12px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+    }
+
+    .day-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .day-tabs button,
+    .clear {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 8px 14px;
+    }
+
+    .day-tabs button[aria-pressed="true"] {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .clear {
+      border-radius: 6px;
+      color: var(--brand);
+      white-space: nowrap;
+    }
+
+    .results-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgba(31, 35, 40, 0.07);
+    }
+
+    table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--soft);
+      color: #3d3630;
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #fbfaf7;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .time {
+      color: var(--brand-strong);
+      font-size: 1.05rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .church {
+      font-weight: 850;
+    }
+
+    .detail {
+      display: inline-flex;
+      max-width: 100%;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.11);
+      color: #0d5f59;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .cards {
+      display: none;
+      gap: 10px;
+    }
+
+    .mass-card {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(31, 35, 40, 0.06);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-head .day {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .empty {
+      display: none;
+      padding: 34px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 780px) {
+      .page {
+        width: min(100% - 24px, 680px);
+        padding-top: 20px;
+      }
+
+      .toolbar {
+        position: static;
+        grid-template-columns: 1fr;
+      }
+
+      .clear {
+        width: 100%;
+      }
+
+      .table-wrap {
+        display: none;
+      }
+
+      .cards {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="eyebrow">Wichita Area Catholic Churches</div>
+      <h1>Mass Times</h1>
+      <p class="intro">
+        Search weekend Catholic Mass times around Wichita, Kansas. Parish schedules can change for holy days,
+        holidays, weather, and special events, so verify with the parish before traveling.
+      </p>
+      <div class="summary" aria-label="Mass time summary">
+        <span id="totalMasses">0 Masses</span>
+        <span id="totalChurches">0 Churches</span>
+        <span id="totalCities">0 Cities</span>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Filters">
+      <label>
+        Search
+        <input id="searchInput" type="search" placeholder="Church, city, time, address, language">
+      </label>
+      <label>
+        City
+        <select id="cityFilter">
+          <option value="">All cities</option>
+        </select>
+      </label>
+      <button id="clearButton" class="clear" type="button">Clear filters</button>
+    </section>
+
+    <nav id="dayTabs" class="day-tabs" aria-label="Day filters"></nav>
+
+    <div class="results-bar">
+      <strong id="resultCount">0 results</strong>
+      <span>Sorted by day, then time.</span>
+    </div>
+
+    <section class="table-wrap" aria-label="Mass times table">
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Church</th>
+            <th>Location</th>
+            <th>Phone</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </section>
+
+    <section id="cardList" class="cards" aria-label="Mass times cards"></section>
+    <section id="emptyState" class="empty">No Mass times match those filters.</section>
+
+    <footer>
+      Source listed in the CSV: Catholic Diocese of Wichita parish directory. This page is generated from
+      <code>wichita_catholic_mass_times_normalized.csv</code>.
+    </footer>
+  </main>
+
+  <script id="massCsv" type="text/plain">Day,Time,Church,Address,City,Phone,Details,Notes,Parish Website,Source URL
+Saturday,7:30 AM,St. Catherine of Siena,3642 N. Ridge Road,Wichita,316-425-0595,,,https://www.saintcatherinewichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,Holy Savior,3000 E 13th Street North,Wichita,316-682-8712,,,https://holy-savior.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Joseph,132 S. Millwood,Wichita,316-261-5800,,,https://stjosephwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Mary,2300 East Meadowlark,Derby,316-788-5525,(First Saturday),Near Wichita,https://stmarysderby.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,(First Saturday),,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Peter the Apostle - Schulte,11000 Southwest Blvd.,Wichita,316-522-4728,(First Saturday),,https://stpeterschulte.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,8:00 AM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,All Saints,3205 E. Grand,Wichita,316-682-1415,,,https://www.allsaintswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,Church of the Blessed Sacrament,124 N. Roosevelt,Wichita,316-682-4557,,,https://blessedsacramentwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,,,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,St. Anthony,1214 E. 2nd,Wichita,316-269-4101,,,https://www.stanthonywichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,St. Cecilia,1912 West Grand,Haysville,316-522-0461,,Near Wichita,https://www.stceciliahaysville.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,St. Joseph,132 S. Millwood,Wichita,316-261-5800,,,https://stjosephwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:00 PM,St. Peter the Apostle - Schulte,11000 Southwest Blvd.,Wichita,316-522-4728,,,https://stpeterschulte.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,Church of the Magdalen,12626 East 21st North,Wichita,316-634-2315,,,https://www.magdalenwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,Church of the Resurrection,4910 North Woodlawn,Bel Aire,316-744-2776,,Near Wichita,https://resurrectionwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,St. Jude,3030 N. Amidon,Wichita,316-838-1963,,,https://stjudewichita.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,St. Margaret Mary,2701 S. Pattie St.,Wichita,316-262-1821,,,https://smmwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:30 PM,St. Paul University Parish (WSU),1810 North Roosevelt,Wichita,316-684-6896,,,https://stpaulwsu.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,4:45 PM,St. Catherine of Siena,3642 N. Ridge Road,Wichita,316-425-0595,,,https://www.saintcatherinewichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,Cathedral of the Immaculate Conception,"430 N. Broadway, Wichita, Kansas 67202-2310",Wichita,316-263-6574,(Spanish; homily summary in English),,https://wichitacathedral.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,St. Mary,2300 East Meadowlark,Derby,316-788-5525,,Near Wichita,https://stmarysderby.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,St. Maximilian Kolbe (McConnell Air Force Base),"22 ARW/HC, 53150 Kansas St.",McConnell AFB,316-759-3562,,Access may be limited,,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,,,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:00 PM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:15 PM,St. Anne,2801 South Seneca,Wichita,316-522-2383,,,https://www.stannewichita.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,5:30 PM,Christ the King,4411 West Maple,Wichita,316-943-4353,,,https://www.ctkwichita.org,https://catholicdioceseofwichita.org/parishes/
+Saturday,6:00 PM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,(Spanish),,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,6:30 PM,St. Margaret Mary,2701 S. Pattie St.,Wichita,316-262-1821,(Spanish),,https://smmwichita.com,https://catholicdioceseofwichita.org/parishes/
+Saturday,7:00 PM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,6:30 AM,Church of the Blessed Sacrament,124 N. Roosevelt,Wichita,316-682-4557,,,https://blessedsacramentwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:00 AM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:30 AM,Church of the Magdalen,12626 East 21st North,Wichita,316-634-2315,,,https://www.magdalenwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:30 AM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,(Spanish),,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:30 AM,St. Catherine of Siena,3642 N. Ridge Road,Wichita,316-425-0595,,,https://www.saintcatherinewichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:30 AM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:30 AM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:00 AM,Christ the King,4411 West Maple,Wichita,316-943-4353,,,https://www.ctkwichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:00 AM,Holy Savior,3000 E 13th Street North,Wichita,316-682-8712,,,https://holy-savior.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:00 AM,St. Cecilia,1912 West Grand,Haysville,316-522-0461,,Near Wichita,https://www.stceciliahaysville.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:00 AM,St. Joseph,132 S. Millwood,Wichita,316-261-5800,,,https://stjosephwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:00 AM,St. Peter the Apostle - Schulte,11000 Southwest Blvd.,Wichita,316-522-4728,,,https://stpeterschulte.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:30 AM,Cathedral of the Immaculate Conception,"430 N. Broadway, Wichita, Kansas 67202-2310",Wichita,316-263-6574,(English; homily summary in Spanish),,https://wichitacathedral.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:30 AM,Church of the Resurrection,4910 North Woodlawn,Bel Aire,316-744-2776,,Near Wichita,https://resurrectionwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:30 AM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:30 AM,St. Jude,3030 N. Amidon,Wichita,316-838-1963,,,https://stjudewichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,8:30 AM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,,,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,All Saints,3205 E. Grand,Wichita,316-682-1415,(English),,https://www.allsaintswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,Church of the Blessed Sacrament,124 N. Roosevelt,Wichita,316-682-4557,,,https://blessedsacramentwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Anne,2801 South Seneca,Wichita,316-522-2383,,,https://www.stannewichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Catherine of Siena,3642 N. Ridge Road,Wichita,316-425-0595,,,https://www.saintcatherinewichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Margaret Mary,2701 S. Pattie St.,Wichita,316-262-1821,,,https://smmwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Mary,2300 East Meadowlark,Derby,316-788-5525,,Near Wichita,https://stmarysderby.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 AM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:30 AM,Church of the Magdalen,12626 East 21st North,Wichita,316-634-2315,,,https://www.magdalenwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:30 AM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,(Spanish),,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:30 AM,St. Anthony,1214 E. 2nd,Wichita,316-269-4101,,,https://www.stanthonywichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:30 AM,St. Joseph,132 S. Millwood,Wichita,316-261-5800,,,https://stjosephwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:30 AM,St. Maximilian Kolbe (McConnell Air Force Base),"22 ARW/HC, 53150 Kansas St.",McConnell AFB,316-759-3562,,Access may be limited,,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:00 AM,Cathedral of the Immaculate Conception,"430 N. Broadway, Wichita, Kansas 67202-2310",Wichita,316-263-6574,(English),,https://wichitacathedral.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:00 AM,St. Cecilia,1912 West Grand,Haysville,316-522-0461,,Near Wichita,https://www.stceciliahaysville.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:00 AM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:00 AM,St. Paul University Parish (WSU),1810 North Roosevelt,Wichita,316-684-6896,,,https://stpaulwsu.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,All Saints,3205 E. Grand,Wichita,316-682-1415,(Vietnamese),,https://www.allsaintswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,Christ the King,4411 West Maple,Wichita,316-943-4353,,,https://www.ctkwichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,St. Margaret Mary,2701 S. Pattie St.,Wichita,316-262-1821,(Spanish),,https://smmwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,,,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,St. Peter the Apostle - Schulte,11000 Southwest Blvd.,Wichita,316-522-4728,,,https://stpeterschulte.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,10:30 AM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,Church of the Blessed Sacrament,124 N. Roosevelt,Wichita,316-682-4557,,,https://blessedsacramentwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,Church of the Resurrection,4910 North Woodlawn,Bel Aire,316-744-2776,,Near Wichita,https://resurrectionwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,Holy Savior,3000 E 13th Street North,Wichita,316-682-8712,,,https://holy-savior.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,St. Anthony,1214 E. 2nd,Wichita,316-269-4101,(Vietnamese),,https://www.stanthonywichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,St. Catherine of Siena,3642 N. Ridge Road,Wichita,316-425-0595,,,https://www.saintcatherinewichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,St. Jude,3030 N. Amidon,Wichita,316-838-1963,,,https://stjudewichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:00 AM,St. Mary,2300 East Meadowlark,Derby,316-788-5525,,Near Wichita,https://stmarysderby.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:15 AM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,(Spanish),,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:30 AM,Church of the Magdalen,12626 East 21st North,Wichita,316-634-2315,,,https://www.magdalenwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,11:30 AM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,12:00 PM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,12:30 PM,Cathedral of the Immaculate Conception,"430 N. Broadway, Wichita, Kansas 67202-2310",Wichita,316-263-6574,(Spanish),,https://wichitacathedral.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,12:30 PM,St. Anne,2801 South Seneca,Wichita,316-522-2383,(Spanish),,https://www.stannewichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,12:30 PM,St. Margaret Mary,2701 S. Pattie St.,Wichita,316-262-1821,(Spanish),,https://smmwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,12:30 PM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,(Spanish),,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,1:00 PM,St. Francis of Assisi,861 North Socora,Wichita,316-722-4404,,,https://www.stfranciswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,1:30 PM,Our Lady of Perpetual Help,2351 North Market,Wichita,316-838-8373,(Spanish),,https://www.olphwichitaks.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,4:00 PM,Holy Savior,3000 E 13th Street North,Wichita,316-682-8712,,,https://holy-savior.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,4:30 PM,Church of the Magdalen,12626 East 21st North,Wichita,316-634-2315,,,https://www.magdalenwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,5:30 PM,Church of the Blessed Sacrament,124 N. Roosevelt,Wichita,316-682-4557,,,https://blessedsacramentwichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,6:00 PM,St. Anne,2801 South Seneca,Wichita,316-522-2383,(Spanish),,https://www.stannewichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,6:00 PM,St. Elizabeth Ann Seton,645 North 119th Street West,Wichita,316-721-1686,,,https://www.seaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,6:30 PM,St. Thomas Aquinas,1321 Stratford Lane,Wichita,316-683-6569,,,https://stthomaswichita.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:00 PM,St. Patrick,2007 North Arkansas Avenue,Wichita,316-262-4683,(Spanish),,https://www.stpatswichita.org,https://catholicdioceseofwichita.org/parishes/
+Sunday,7:00 PM,St. Paul University Parish (WSU),1810 North Roosevelt,Wichita,316-684-6896,,,https://stpaulwsu.com,https://catholicdioceseofwichita.org/parishes/
+Sunday,9:00 PM,St. Paul University Parish (WSU),1810 North Roosevelt,Wichita,316-684-6896,,,https://stpaulwsu.com,https://catholicdioceseofwichita.org/parishes/</script>
+
+  <script>
+    const csvText = document.getElementById("massCsv").textContent.trim();
+    const rows = parseCsv(csvText);
+    const headers = rows.shift();
+    const masses = rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])));
+
+    const state = {
+      day: "",
+      city: "",
+      query: ""
+    };
+
+    const dayTabs = document.getElementById("dayTabs");
+    const cityFilter = document.getElementById("cityFilter");
+    const searchInput = document.getElementById("searchInput");
+    const clearButton = document.getElementById("clearButton");
+    const tableBody = document.getElementById("tableBody");
+    const cardList = document.getElementById("cardList");
+    const resultCount = document.getElementById("resultCount");
+    const emptyState = document.getElementById("emptyState");
+
+    init();
+
+    function init() {
+      setSummary();
+      renderDayTabs();
+      renderCityOptions();
+      render();
+
+      searchInput.addEventListener("input", (event) => {
+        state.query = event.target.value.trim().toLowerCase();
+        render();
+      });
+
+      cityFilter.addEventListener("change", (event) => {
+        state.city = event.target.value;
+        render();
+      });
+
+      clearButton.addEventListener("click", () => {
+        state.day = "";
+        state.city = "";
+        state.query = "";
+        searchInput.value = "";
+        cityFilter.value = "";
+        renderDayTabs();
+        render();
+      });
+    }
+
+    function setSummary() {
+      document.getElementById("totalMasses").textContent = `${masses.length} Masses`;
+      document.getElementById("totalChurches").textContent = `${unique("Church").length} Churches`;
+      document.getElementById("totalCities").textContent = `${unique("City").length} Cities`;
+    }
+
+    function renderDayTabs() {
+      const days = ["", ...unique("Day")];
+      dayTabs.innerHTML = days.map((day) => {
+        const label = day || "All days";
+        const pressed = state.day === day ? "true" : "false";
+        return `<button type="button" aria-pressed="${pressed}" data-day="${escapeAttr(day)}">${escapeHtml(label)}</button>`;
+      }).join("");
+
+      dayTabs.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.day = button.dataset.day;
+          renderDayTabs();
+          render();
+        });
+      });
+    }
+
+    function renderCityOptions() {
+      cityFilter.insertAdjacentHTML("beforeend", unique("City").map((city) => (
+        `<option value="${escapeAttr(city)}">${escapeHtml(city)}</option>`
+      )).join(""));
+    }
+
+    function render() {
+      const filtered = masses.filter((mass) => {
+        const haystack = Object.values(mass).join(" ").toLowerCase();
+        return (!state.day || mass.Day === state.day)
+          && (!state.city || mass.City === state.city)
+          && (!state.query || haystack.includes(state.query));
+      });
+
+      resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? "result" : "results"}`;
+      emptyState.style.display = filtered.length ? "none" : "block";
+      tableBody.innerHTML = filtered.map(renderRow).join("");
+      cardList.innerHTML = filtered.map(renderCard).join("");
+    }
+
+    function renderRow(mass) {
+      const detail = [mass.Details, mass.Notes].filter(Boolean).join(" ");
+      return `
+        <tr>
+          <td>${escapeHtml(mass.Day)}</td>
+          <td class="time">${escapeHtml(mass.Time)}</td>
+          <td>
+            <div class="church">${escapeHtml(mass.Church)}</div>
+            ${detail ? `<span class="detail">${escapeHtml(detail)}</span>` : ""}
+          </td>
+          <td>
+            <div>${escapeHtml(mass.Address)}</div>
+            <div class="muted">${escapeHtml(mass.City)}</div>
+          </td>
+          <td>${phoneLink(mass.Phone)}</td>
+          <td>${siteLinks(mass)}</td>
+        </tr>`;
+    }
+
+    function renderCard(mass) {
+      const detail = [mass.Details, mass.Notes].filter(Boolean).join(" ");
+      return `
+        <article class="mass-card">
+          <div class="card-head">
+            <strong class="time">${escapeHtml(mass.Time)}</strong>
+            <span class="day">${escapeHtml(mass.Day)}</span>
+          </div>
+          <div class="church">${escapeHtml(mass.Church)}</div>
+          ${detail ? `<span class="detail">${escapeHtml(detail)}</span>` : ""}
+          <div>
+            <div>${escapeHtml(mass.Address)}</div>
+            <div class="muted">${escapeHtml(mass.City)}</div>
+          </div>
+          <div>${phoneLink(mass.Phone)}</div>
+          <div>${siteLinks(mass)}</div>
+        </article>`;
+    }
+
+    function siteLinks(mass) {
+      const links = [];
+      if (mass["Parish Website"]) {
+        links.push(`<a href="${escapeAttr(mass["Parish Website"])}" target="_blank" rel="noopener">Parish</a>`);
+      }
+      if (mass["Source URL"]) {
+        links.push(`<a href="${escapeAttr(mass["Source URL"])}" target="_blank" rel="noopener">Source</a>`);
+      }
+      return links.join(" <span class=\"muted\">/</span> ") || `<span class="muted">No link</span>`;
+    }
+
+    function phoneLink(phone) {
+      if (!phone) return `<span class="muted">No phone</span>`;
+      return `<a href="tel:${escapeAttr(phone.replace(/[^0-9]/g, ""))}">${escapeHtml(phone)}</a>`;
+    }
+
+    function unique(field) {
+      return [...new Set(masses.map((mass) => mass[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let field = "";
+      let inQuotes = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        const next = text[index + 1];
+
+        if (char === "\"") {
+          if (inQuotes && next === "\"") {
+            field += "\"";
+            index += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          row.push(field);
+          field = "";
+        } else if ((char === "\n" || char === "\r") && !inQuotes) {
+          if (char === "\r" && next === "\n") index += 1;
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = "";
+        } else {
+          field += char;
+        }
+      }
+
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+  </script>
+</body>
+</html>
